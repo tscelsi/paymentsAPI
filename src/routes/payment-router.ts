@@ -10,8 +10,9 @@ const { CREATED, OK } = StatusCodes;
 
 // Paths
 export const p = {
+    getAll: '/',
     create: '/create',
-    get: '/:payment_id',
+    getOne: '/:payment_id',
     amend: '/:payment_id/amend',
     // schedule: '/:payment_id/schedule',
 } as const;
@@ -36,10 +37,16 @@ router.post(p.create, async (req: Request, res: Response) => {
     return res.status(OK).json(payment);
 });
 
+router.get(p.getAll, async (req: Request, res: Response) => {
+    const { access_token } = req.headers;
+    const payments = await paymentRepo.getAll(access_token as string);
+    return res.status(OK).json(payments);
+})
+
 /**
  * Get a payment from /payments/:payment_id.
  */
-router.get(p.get, async (req: Request, res: Response) => {
+router.get(p.getOne, async (req: Request, res: Response) => {
     const { payment_id } = req.params;
     const payment = await paymentRepo.getOne(payment_id);
     if (!payment) {

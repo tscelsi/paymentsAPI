@@ -2,6 +2,23 @@ import { IPayment } from '@models/payment-model';
 import orm from './mock-orm';
 
 /**
+ * Get all payments for a particular user
+ * @param 
+ * @returns 
+ */
+ async function getAll(user_id: string): Promise<IPayment[]> {
+    const db = await orm.openDb();
+    const payments = [];
+    for (const payment of db.payments) {
+        if (payment.user_id === user_id) {
+            payments.push(payment);
+        }
+    }
+    return payments;
+}
+
+
+/**
  * Get one payment.
  * 
  * @param payment
@@ -50,6 +67,7 @@ async function update(payment: IPayment): Promise<void> {
 
 // Export default
 export default {
+    getAll,
     getOne,
     add,
     update,

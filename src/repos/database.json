@@ -1,1 +1,28 @@
-{"users":[{"name":"Daffy Duck","email":"d.duck@gmail.com","pwdHash":"$2b$12$1mE2OI9hMS/rgH9Mi0s85OM2V5gzm7aF3gJIWH1y0S1MqVBueyjsy","id":"8e81101f-6b3f-41a3-9fc3-199f8df1a7de"},{"name":"Scrooge McDuck","email":"s.mcduck@gmail.com","pwdHash":"$2b$12$1mE2OI9hMS/rgH9Mi0s85OM2V5gzm7aF3gJIWH1y0S1MqVBueyjsy","id":"0a34843a-d27c-42e0-8991-7b2f07b0a66e"}],"payments":[{"payment_id":"52d7b407-fa1e-4305-b7bb-408e42a96a99","user_id":"8e81101f-6b3f-41a3-9fc3-199f8df1a7de","amount":29,"description":"hey there dawg","receiving_user_id":"0a34843a-d27c-42e0-8991-7b2f07b0a66e","created_at":"2022-03-18T03:53:13.020Z","state":"pending","updated_at":"2022-03-18T05:56:25.603Z"}]}
+{
+    "users": [
+        {
+            "name": "Daffy Duck",
+            "email": "d.duck@gmail.com",
+            "pwdHash": "$2b$12$1mE2OI9hMS/rgH9Mi0s85OM2V5gzm7aF3gJIWH1y0S1MqVBueyjsy",
+            "id": "8e81101f-6b3f-41a3-9fc3-199f8df1a7de"
+        },
+        {
+            "name": "Scrooge McDuck",
+            "email": "s.mcduck@gmail.com",
+            "pwdHash": "$2b$12$1mE2OI9hMS/rgH9Mi0s85OM2V5gzm7aF3gJIWH1y0S1MqVBueyjsy",
+            "id": "0a34843a-d27c-42e0-8991-7b2f07b0a66e"
+        }
+    ],
+    "payments": [
+        {
+            "payment_id": "52d7b407-fa1e-4305-b7bb-408e42a96a99",
+            "user_id": "8e81101f-6b3f-41a3-9fc3-199f8df1a7de",
+            "amount": 29,
+            "description": "hey there dawg",
+            "receiving_user_id": "0a34843a-d27c-42e0-8991-7b2f07b0a66e",
+            "created_at": "2022-03-18T03:53:13.020Z",
+            "state": "pending",
+            "updated_at": "2022-03-18T05:56:25.603Z"
+        }
+    ]
+}
