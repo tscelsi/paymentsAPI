@@ -60,11 +60,38 @@ export class InvalidAmountError extends CustomError {
     }
 }
 
+export class InvalidDescriptionError extends CustomError {
+    public static readonly Msg = 'A description must be provided, or else remove the field.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(InvalidDescriptionError.Msg, InvalidDescriptionError.HttpStatus);
+    }
+}
+
 export class BeneficiaryNotFoundError extends CustomError {
     public static readonly Msg = 'The user receiving payment does not exist.';
     public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
 
     constructor() {
         super(BeneficiaryNotFoundError.Msg, BeneficiaryNotFoundError.HttpStatus);
+    }
+}
+
+export class UserNotFoundError extends CustomError {
+    public static readonly Msg = 'User does not exist.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(UserNotFoundError.Msg, UserNotFoundError.HttpStatus);
+    }
+}
+
+export class PaymentAlreadyFinalisedError extends CustomError {
+    public static readonly Msg = 'Payment is already finalised and cannot be amended.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(PaymentAlreadyFinalisedError.Msg, PaymentAlreadyFinalisedError.HttpStatus);
     }
 }

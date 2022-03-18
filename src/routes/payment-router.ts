@@ -3,7 +3,7 @@ import { Request, Response, Router } from 'express';
 import paymentRepo from "@repos/payment-repo";
 import { PaymentNotFoundError, IncorrectPaymentFields, UnauthorisedError } from "@shared/errors";
 import { getNew } from "@models/payment-model";
-import { validateAndPersistPayment } from "@shared/validation";
+import { amendPayment, validateAndPersistPayment } from "@shared/validation";
 // Constants
 const router = Router();
 const { CREATED, OK } = StatusCodes;
@@ -26,6 +26,7 @@ router.post(p.create, async (req: Request, res: Response) => {
     const { access_token } = req.headers;
     const { amount, description, receiving_user_id } = req.body;
     if (!amount || !description || !receiving_user_id) {
+        // this if clause attends to Validation Rule #3 in the specs.
         throw new IncorrectPaymentFields();
     }
     // can use 'as string' in following as access_token will never be of type string[], see req.headers docs for more info
@@ -38,7 +39,7 @@ router.post(p.create, async (req: Request, res: Response) => {
 /**
  * Get a payment from /payments/:payment_id.
  */
- router.get(p.get, async (req: Request, res: Response) => {
+router.get(p.get, async (req: Request, res: Response) => {
     const { payment_id } = req.params;
     const payment = await paymentRepo.getOne(payment_id);
     if (!payment) {
@@ -49,15 +50,18 @@ router.post(p.create, async (req: Request, res: Response) => {
 });
 
 /**
+ * /payments/:payment_id/amend
  * Amend a pending or incomplete payment
  */
 router.post(p.amend, async (req: Request, res: Response) => {
     const { payment_id } = req.params;
+    const { amount, description, receiving_user_id } = req.body;
     const payment = await paymentRepo.getOne(payment_id);
     if (!payment) {
         throw new PaymentNotFoundError()
     } else {
-        return res.status(OK).json(payment);
+        const amendedPayment = await amendPayment(payment, { amount, description, receiving_user_id });
+        return res.status(OK).json(amendedPayment);
     }
 });
 

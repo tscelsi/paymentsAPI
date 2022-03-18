@@ -11,6 +11,7 @@ export interface IPayment {
     amount: number;
     description: string;
     created_at: string;
+    amended_at?: string;
     receiving_user_id: string;
     state: State
 }
