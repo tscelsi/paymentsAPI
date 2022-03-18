@@ -9,11 +9,11 @@
     - [Incomplete](#incomplete)
     - [Successful](#successful)
   - [API Reference](#api-reference)
-    - [**/payment**](#payment)
-      - [/payment/get](#paymentget)
-      - [/payment/amend](#paymentamend)
-      - [/payment/pay](#paymentpay)
-      - [/payment/schedule](#paymentschedule)
+    - [**/payments**](#payments)
+      - [/payments/:payment_id](#paymentspayment_id)
+      - [/payments/:payment_id/amend](#paymentspayment_idamend)
+      - [/payments/create](#paymentscreate)
+      - [/payments/schedule](#paymentsschedule)
     - [**/customer**](#customer)
       - [/customer/balance](#customerbalance)
 - [Contact](#contact)
@@ -54,19 +54,16 @@ A `Successful` payment exists when none of the conditions that would make a paym
 
 ## API Reference
 
-### **/payment**
+### **/payments**
 
 The payment endpoint takes care of either paying upfront using `/pay` or scheduling a future payment using `/schedule`.
 
-#### /payment/get
+#### /payments/:payment_id
 
 This endpoint retrieves a particular payment object that has previously been created by a user. A payment object created by a user should not be able to be retrieved by a different user.
 
-`REQUEST:`
-
-    {
+`PARAMS:`
         payment_id (required): A string of characters that uniquely identifies a payment
-    }
 
 `RESPONSE:`
 
@@ -79,7 +76,7 @@ This endpoint retrieves a particular payment object that has previously been cre
         state: pending | incomplete | successful // the state of the returned payment object.
     }
 
-#### /payment/amend
+#### /payments/:payment_id/amend
 
 This endpoint allows the update of a payment object that is either in the `pending` or `incomplete` state. If an `incomplete` payment is updated, the transaction will be re-tried. For an amendment to be made, one of `amount`, `description` or `receiving_user_id` must be provided.
 
@@ -106,7 +103,7 @@ The updated payment object is returned:
     }
 
 
-#### /payment/pay
+#### /payments/create
 This endpoint creates a new payment object.
 
 The payload fields that can be submitted to the `/pay` endpoint are:
@@ -125,7 +122,7 @@ The payload fields that can be submitted to the `/pay` endpoint are:
     {
       payment_id: string // the unique identifier of the created payment object.
     }
-#### /payment/schedule
+#### /payments/schedule
 ### **/customer**
 #### /customer/balance
 # Contact
