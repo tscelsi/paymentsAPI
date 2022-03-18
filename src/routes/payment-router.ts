@@ -3,7 +3,7 @@ import { Request, Response, Router } from 'express';
 import paymentRepo from "@repos/payment-repo";
 import { PaymentNotFoundError, IncorrectPaymentFields, UnauthorisedError } from "@shared/errors";
 import { getNew } from "@models/payment-model";
-import { validateAndPersistPayment } from "@shared/api";
+import { validateAndPersistPayment } from "@shared/validation";
 // Constants
 const router = Router();
 const { CREATED, OK } = StatusCodes;
@@ -16,12 +16,29 @@ export const p = {
     // schedule: '/:payment_id/schedule',
 } as const;
 
-
+/**
+ * /payments/create
+ * Create a new payment object
+ */
+router.post(p.create, async (req: Request, res: Response) => {
+    // extract user from request headers, usually done in middleware for auth purposes but
+    // for simplicity I just do it here.
+    const { access_token } = req.headers;
+    const { amount, description, receiving_user_id } = req.body;
+    if (!amount || !description || !receiving_user_id) {
+        throw new IncorrectPaymentFields();
+    }
+    // can use 'as string' in following as access_token will never be of type string[], see req.headers docs for more info
+    const payment = getNew(access_token as string, amount, description, receiving_user_id);
+    await validateAndPersistPayment(payment);
+    // return success
+    return res.status(OK).json(payment);
+});
 
 /**
  * Get a payment from /payments/:payment_id.
  */
-router.get(p.get, async (req: Request, res: Response) => {
+ router.get(p.get, async (req: Request, res: Response) => {
     const { payment_id } = req.params;
     const payment = await paymentRepo.getOne(payment_id);
     if (!payment) {
@@ -32,26 +49,18 @@ router.get(p.get, async (req: Request, res: Response) => {
 });
 
 /**
- * /payments/create
- * Create a new payment object
+ * Amend a pending or incomplete payment
  */
-router.post(p.create, async (req: Request, res: Response) => {
-    // extract user from request headers, usually done in middleware for auth purposes but
-    // for simplicity I just do it here.
-    console.log(req.headers);
-    const { access_token } = req.headers;
-    const { amount, description, receiving_user_id } = req.body;
-    if (!access_token) {
-        throw new UnauthorisedError();
-    } else if (!amount || !description || !receiving_user_id) {
-        throw new IncorrectPaymentFields();
+router.post(p.amend, async (req: Request, res: Response) => {
+    const { payment_id } = req.params;
+    const payment = await paymentRepo.getOne(payment_id);
+    if (!payment) {
+        throw new PaymentNotFoundError()
+    } else {
+        return res.status(OK).json(payment);
     }
-    // can use 'as string' in following as access_token will never be of type string[], see req.headers docs for more info
-    const payment = getNew(access_token as string, amount, description, receiving_user_id);
-    await validateAndPersistPayment(payment);
-    // return success
-    return res.status(OK).json(payment);
 });
+
 
 // /**
 //  * Add one user.

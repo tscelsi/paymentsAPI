@@ -59,3 +59,12 @@ export class InvalidAmountError extends CustomError {
         super(InvalidAmountError.Msg, InvalidAmountError.HttpStatus);
     }
 }
+
+export class BeneficiaryNotFoundError extends CustomError {
+    public static readonly Msg = 'The user receiving payment does not exist.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(BeneficiaryNotFoundError.Msg, BeneficiaryNotFoundError.HttpStatus);
+    }
+}
