@@ -1,4 +1,4 @@
-*Welcome to PaymentsAPI!*, a simple API that allows users to make and schedule payments as well as view their balance implemented using Node.js and the Express framework. The skeleton for this project was generated using [express-generator-typescript](https://www.npmjs.com/package/express-generator-typescript).
+*Welcome to PaymentsAPI!*, a simple API that allows users to make and schedule payments as well as view their balance. It has been implemented using Node.js and the Express framework. The skeleton for this project was generated using [express-generator-typescript](https://www.npmjs.com/package/express-generator-typescript).
 
 - [Installation](#installation)
 - [Running the API](#running-the-api)
@@ -10,11 +10,12 @@
     - [Successful](#successful)
   - [API Reference](#api-reference)
     - [**/payment**](#payment)
-      - [**/payment/get**](#paymentget)
-      - [**/payment/pay**](#paymentpay)
-      - [**/payment/schedule**](#paymentschedule)
+      - [/payment/get](#paymentget)
+      - [/payment/amend](#paymentamend)
+      - [/payment/pay](#paymentpay)
+      - [/payment/schedule](#paymentschedule)
     - [**/customer**](#customer)
-      - [**/customer/balance**](#customerbalance)
+      - [/customer/balance](#customerbalance)
 - [Contact](#contact)
 
 # Installation
@@ -35,7 +36,7 @@ A payment object can exist in multiple states depending on whether it is a valid
 
 ### Pending
 
-A `pending` payment is one that has been created, but not finalised in either the [Incomplete](#incomplete) state, or the [Successful](#finalised) state.
+A `pending` payment is one that has been created, but not finalised in either the [Incomplete](#incomplete) state, or the [Successful](#finalised) state. For example, this occurs when scheduling payments in advance.
 
 ### Incomplete
 
@@ -52,10 +53,12 @@ An `Incomplete` payment is one that has been created and deemed invalid due to a
 A `Successful` payment exists when none of the conditions that would make a payment `Incomplete` occur and the payment transaction has completed.
 
 ## API Reference
+
 ### **/payment**
+
 The payment endpoint takes care of either paying upfront using `/pay` or scheduling a future payment using `/schedule`.
 
-#### **/payment/get**
+#### /payment/get
 
 This endpoint retrieves a particular payment object that has previously been created by a user. A payment object created by a user should not be able to be retrieved by a different user.
 
@@ -68,15 +71,42 @@ This endpoint retrieves a particular payment object that has previously been cre
 `RESPONSE:`
 
     {
-        user_id: string, // the unique user identifier
-        amount: number, // the monetary amount payed
-        description: string, // description of the payment
-        created_at: string, // a string representation of the time the payment was created
-        receiving_user_id: string, // unique user id of user receiving payment
+        user_id: string,  // the unique user identifier
+        amount: number,   // the monetary amount payed
+        description: string,  // description of the payment
+        created_at: string,   // a string representation of the time the payment was created
+        receiving_user_id: string,  // unique user id of user receiving payment
         state: pending | incomplete | successful // the state of the returned payment object.
     }
 
-#### **/payment/pay**
+#### /payment/amend
+
+This endpoint allows the update of a payment object that is either in the `pending` or `incomplete` state. If an `incomplete` payment is updated, the transaction will be re-tried. For an amendment to be made, one of `amount`, `description` or `receiving_user_id` must be provided.
+
+`REQUEST:`
+
+    {
+      payment_id (required): string,  // the unique id of the payment to amend
+      amount (optional): number,  // the monetary amount payed
+      description (optional): string,   // description of the payment
+      receiving_user_id (optional): string  // the unique id of the user receiving the payment
+    }  
+
+`RESPONSE:`
+
+The updated payment object is returned:
+
+    {
+      user_id: string,  // the unique user identifier
+      amount: number,   // the monetary amount payed
+      description: string,  // description of the payment
+      created_at: string,   // a string representation of the time the payment was created
+      receiving_user_id: string,  // unique user id of user receiving payment
+      state: pending | incomplete | successful  // the state of the returned payment object.
+    }
+
+
+#### /payment/pay
 This endpoint creates and finalises a payment between two particular users. In order for a payment to be finalised:
 
 The payload fields that can be submitted to the `/pay` endpoint are:
@@ -88,7 +118,7 @@ The payload fields that can be submitted to the `/pay` endpoint are:
         receiving_user_id: A unique identifier of the user receiving the payment (this equates to the beneficiary name)
     }
 
-#### **/payment/schedule**
+#### /payment/schedule
 ### **/customer**
-#### **/customer/balance**
+#### /customer/balance
 # Contact
