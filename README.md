@@ -107,9 +107,11 @@ The updated payment object is returned:
 
 
 #### /payment/pay
-This endpoint creates and finalises a payment between two particular users. In order for a payment to be finalised:
+This endpoint creates a new payment object.
 
 The payload fields that can be submitted to the `/pay` endpoint are:
+
+`REQUEST:`
     
     {
         paying_user_id: A unique identifier of the paying user,
@@ -118,6 +120,11 @@ The payload fields that can be submitted to the `/pay` endpoint are:
         receiving_user_id: A unique identifier of the user receiving the payment (this equates to the beneficiary name)
     }
 
+`RESPONSE:`
+
+    {
+      payment_id: string // the unique identifier of the created payment object.
+    }
 #### /payment/schedule
 ### **/customer**
 #### /customer/balance
