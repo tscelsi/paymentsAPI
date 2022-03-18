@@ -8,6 +8,7 @@
     - [Pending](#pending)
     - [Incomplete](#incomplete)
     - [Successful](#successful)
+  - [User Authentication](#user-authentication)
   - [API Reference](#api-reference)
     - [**/payments**](#payments)
       - [/payments/:payment_id](#paymentspayment_id)
@@ -52,22 +53,47 @@ An `Incomplete` payment is one that has been created and deemed invalid due to a
 
 A `Successful` payment exists when none of the conditions that would make a payment `Incomplete` occur and the payment transaction has completed.
 
+## User Authentication
+
+In this project 'authentication' simply means passing a valid `access_token` in each requests headers. The `access_token` represents the user ID of an existing user in the database. If, for example, an `access_token` was passed that contained an invalid user ID, then any API request returns with the 401 Unauthorised HTTP status code. This `access_token` is also used to create, retrieve and update payments that are linked to a particular user.
+
 ## API Reference
 
 ### **/payments**
 
-The payment endpoint takes care of either paying upfront using `/pay` or scheduling a future payment using `/schedule`.
+The `/payments` endpoint itself returns a list of all the payments created by the user that is authenticated to use the API.
+
+`TYPE:` **GET**
+
+`RESPONSE:` 
+    
+    [
+      {
+        payment_id: string,   // the unique payment identifier
+        user_id: string,  // the unique user identifier
+        amount: number,   // the monetary amount payed
+        description: string,  // description of the payment
+        created_at: string,   // a string representation of the time the payment was created
+        receiving_user_id: string,  // unique user id of user receiving payment
+        state: pending | incomplete | successful // the state of the returned payment object.
+      },
+      ...
+    ]
 
 #### /payments/:payment_id
 
 This endpoint retrieves a particular payment object that has previously been created by a user. A payment object created by a user should not be able to be retrieved by a different user.
 
+`TYPE:` **GET**
+
 `PARAMS:`
-        payment_id (required): A string of characters that uniquely identifies a payment
+        *payment_id* (required): A string of characters that uniquely identifies a payment
 
 `RESPONSE:`
+The payment object is returned:
 
     {
+        payment_id: string,   // the unique payment identifier
         user_id: string,  // the unique user identifier
         amount: number,   // the monetary amount payed
         description: string,  // description of the payment
@@ -80,10 +106,14 @@ This endpoint retrieves a particular payment object that has previously been cre
 
 This endpoint allows the update of a payment object that is either in the `pending` or `incomplete` state. If an `incomplete` payment is updated, the transaction will be re-tried. For an amendment to be made, one of `amount`, `description` or `receiving_user_id` must be provided.
 
+`TYPE:` **POST**
+
+`PARAMS:`
+        *payment_id* (required): A string of characters that uniquely identifies a payment
+
 `REQUEST:`
 
     {
-      payment_id (required): string,  // the unique id of the payment to amend
       amount (optional): number,  // the monetary amount payed
       description (optional): string,   // description of the payment
       receiving_user_id (optional): string  // the unique id of the user receiving the payment
@@ -94,6 +124,7 @@ This endpoint allows the update of a payment object that is either in the `pendi
 The updated payment object is returned:
 
     {
+      payment_id: string,   // the unique payment identifier
       user_id: string,  // the unique user identifier
       amount: number,   // the monetary amount payed
       description: string,  // description of the payment
@@ -108,10 +139,11 @@ This endpoint creates a new payment object.
 
 The payload fields that can be submitted to the `/pay` endpoint are:
 
+`TYPE:` **POST**
+
 `REQUEST:`
     
     {
-        paying_user_id: A unique identifier of the paying user,
         amount: The monetary amount that should be payed,
         description: A description of what the payment is for,
         receiving_user_id: A unique identifier of the user receiving the payment (this equates to the beneficiary name)
@@ -119,9 +151,18 @@ The payload fields that can be submitted to the `/pay` endpoint are:
 
 `RESPONSE:`
 
+If successful, this endpoint returns the newly created payment object.
+
     {
-      payment_id: string // the unique identifier of the created payment object.
+      payment_id: string,   // the unique payment identifier
+      user_id: string,  // the unique user identifier
+      amount: number,   // the monetary amount payed
+      description: string,  // description of the payment
+      created_at: string,   // a string representation of the time the payment was created
+      receiving_user_id: string,  // unique user id of user receiving payment
+      state: pending | incomplete | successful  // the state of the returned payment object.
     }
+
 #### /payments/schedule
 ### **/customer**
 #### /customer/balance
