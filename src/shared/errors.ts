@@ -11,6 +11,15 @@ export abstract class CustomError extends Error {
     }
 }
 
+export class UnauthorisedError extends CustomError {
+    public static readonly Msg = 'Unauthorised request.';
+    public static readonly HttpStatus = HttpStatusCodes.UNAUTHORIZED;
+
+    constructor() {
+        super(UnauthorisedError.Msg, UnauthorisedError.HttpStatus);
+    }
+}
+
 
 export class ParamMissingError extends CustomError {
 
@@ -23,12 +32,30 @@ export class ParamMissingError extends CustomError {
 }
 
 
-export class UserNotFoundError extends CustomError {
+export class PaymentNotFoundError extends CustomError {
 
-    public static readonly Msg = 'A user with the given id does not exists in the database.';
+    public static readonly Msg = 'A payment with the given id does not exist in the database.';
     public static readonly HttpStatus = HttpStatusCodes.NOT_FOUND;
 
     constructor() {
-        super(UserNotFoundError.Msg, UserNotFoundError.HttpStatus);
+        super(PaymentNotFoundError.Msg, PaymentNotFoundError.HttpStatus);
+    }
+}
+
+export class IncorrectPaymentFields extends CustomError {
+    public static readonly Msg = 'Payment fields are incorrectly assigned or required fields are missing.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(IncorrectPaymentFields.Msg, IncorrectPaymentFields.HttpStatus);
+    }
+}
+
+export class InvalidAmountError extends CustomError {
+    public static readonly Msg = 'Cannot supply a negative amount.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(InvalidAmountError.Msg, InvalidAmountError.HttpStatus);
     }
 }

@@ -1,15 +1,17 @@
 import { stringify } from "querystring";
 import { getRandomInt } from '@shared/functions';
+import { v4 as uuidv4 } from 'uuid';
 
 type State = "pending" | "incomplete" | "successful"
 
 // Payment schema
 export interface IPayment {
-    payment_id: number;
-    user_id: number;
+    payment_id: string;
+    user_id: string;
+    amount: number;
     description: string;
     created_at: string;
-    receiving_user_id: number;
+    receiving_user_id: string;
     state: State
 }
 
@@ -19,10 +21,12 @@ export interface IPayment {
  * 
  * @returns 
  */
-function getNew(user_id: number, description: string, receiving_user_id: number): IPayment {
+export function getNew(user_id: string, amount: number, description: string, receiving_user_id: string): IPayment {
+    const payment_id = uuidv4();
     return {
-        payment_id: getRandomInt(),
+        payment_id: payment_id,
         user_id: user_id,
+        amount,
         description,
         receiving_user_id,
         created_at: new Date().toISOString(),
@@ -33,5 +37,5 @@ function getNew(user_id: number, description: string, receiving_user_id: number)
 
 // Export default
 export default {
-    new: getNew,
+    getNew,
 }
