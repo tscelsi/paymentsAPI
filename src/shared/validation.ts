@@ -9,7 +9,8 @@ import {
     PaymentNotFoundError,
     UserNotFoundError,
     PaymentAlreadyFinalisedError,
-    InvalidDescriptionError
+    InvalidDescriptionError,
+    InsufficientFundsError
 } from "@shared/errors";
 import paymentRepo from "@repos/payment-repo";
 import userRepo from "@repos/user-repo";
@@ -28,29 +29,51 @@ const isValidUser = async (user_id: string): Promise<boolean> => {
     else return false;
 }
 
-export const validateAndPersistPayment = async (payment: IPayment): Promise<void> => {
-    if (!isValidAmount(payment.amount)) {
+export const validatePayment = (from_user: string, amount: number, to_user: string): void => {
+    if (!isValidAmount(amount)) {
         throw new InvalidAmountError();
-    } else if (!isValidUser(payment.receiving_user_id)) {
+    } else if (!isValidUser(from_user)) {
+        throw new UserNotFoundError();
+    } else if (!isValidUser(to_user)) {
         throw new BeneficiaryNotFoundError();
     }
-    await paymentRepo.add(payment);
-    // if no schedule date is given, we should try to charge the payment straight away
-    await charge(payment.payment_id);
 }
 
-export const charge = async (payment_id: string) => {
+export const persistPayment = async (payment: IPayment): Promise<void> => {
+    // if no schedule date is given, we should try to charge the payment straight away
+    await charge(payment);
+}
+
+export const charge = async (payment: IPayment): Promise<void> => {
     // here we transfer the monetary amount between the two users contained in the payment transaction.
-    const payment = await paymentRepo.getOne(payment_id);
-    if (!payment) {
-        throw new PaymentNotFoundError();
-    }
-    const payer = await userRepo.getOne(payment.user_id);
-    const payee = await userRepo.getOne(payment.receiving_user_id);
-    if (!payer || !payee) {
+    // before we transfer, we validate fields and account balance at charge time.
+    const from_user = await userRepo.getOne(payment.user_id);
+    const to_user = await userRepo.getOne(payment.receiving_user_id);
+    if (!from_user || !to_user) {
+        // we will also terminate payment as incomplete due to this error, either the from_user has removed their account,
+        // else the to_user (payee) doesn't exist. In either case, we're done with this payment unless amended.
+        payment.state = "incomplete";
+        paymentRepo.update(payment);
         throw new UserNotFoundError();
     }
-    // TODO
+    // validate balance
+    if (from_user.balance < payment.amount) {
+        // terminate the payment as incomplete
+        payment.state = "incomplete";
+        paymentRepo.update(payment);
+        throw new InsufficientFundsError();
+    } else {
+        // update the balances in the user accounts
+        from_user.balance = from_user.balance - payment.amount;
+        to_user.balance = to_user.balance + payment.amount;
+        payment.state = "successful";
+        // we just bunch all the updates together, this can be fleshed out for better, more error-catching behaviour.
+        // e.g. refactored into another function and better error catching.
+        // we only add the payment object if all validation is successful and user balance updates are successful.
+        userRepo.update(from_user)
+        .then(() => userRepo.update(to_user))
+        .then(() => paymentRepo.add(payment))
+    }
 }
 
 interface Amendments {

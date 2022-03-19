@@ -5,6 +5,7 @@ export interface IUser {
     id: string;
     name: string;
     email: string;
+    balance: number;
 }
 
 
@@ -13,11 +14,12 @@ export interface IUser {
  * 
  * @returns 
  */
-function getNew(name: string, email: string): IUser {
+function getNew(name: string, email: string, balance = 0): IUser {
     return {
         id: v4(),
         email,
         name,
+        balance
     };
 }
 
@@ -33,6 +35,7 @@ function copy(user: IUser): IUser {
         id: user.id,
         email: user.email,
         name: user.name,
+        balance: user.balance
     }
 }
 
