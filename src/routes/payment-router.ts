@@ -3,7 +3,7 @@ import { Request, Response, Router } from 'express';
 import paymentRepo from "@repos/payment-repo";
 import { PaymentNotFoundError, IncorrectPaymentFields, UnauthorisedError } from "@shared/errors";
 import { getNew } from "@models/payment-model";
-import { amendPayment, validateAndPersistPayment } from "@shared/validation";
+import { amendPayment, persistPayment, validatePayment } from "@shared/validation";
 // Constants
 const router = Router();
 const { CREATED, OK } = StatusCodes;
@@ -31,8 +31,10 @@ router.post(p.create, async (req: Request, res: Response) => {
         throw new IncorrectPaymentFields();
     }
     // can use 'as string' in following as access_token will never be of type string[], see req.headers docs for more info
+    validatePayment(access_token as string, amount, receiving_user_id);
+    // if no error has been thrown, then we can create a new payment object and attempt to charge.
     const payment = getNew(access_token as string, amount, description, receiving_user_id);
-    await validateAndPersistPayment(payment);
+    await persistPayment(payment);
     // return success
     return res.status(OK).json(payment);
 });

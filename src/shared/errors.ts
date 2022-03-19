@@ -95,3 +95,12 @@ export class PaymentAlreadyFinalisedError extends CustomError {
         super(PaymentAlreadyFinalisedError.Msg, PaymentAlreadyFinalisedError.HttpStatus);
     }
 }
+
+export class InsufficientFundsError extends CustomError {
+    public static readonly Msg = 'There are insufficient funds in your account.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(InsufficientFundsError.Msg, InsufficientFundsError.HttpStatus);
+    }
+}
