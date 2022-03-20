@@ -3,17 +3,17 @@ import { Request, Response, Router } from 'express';
 import paymentRepo from "@repos/payment-repo";
 import { PaymentNotFoundError, IncorrectPaymentFields, UnauthorisedError } from "@shared/errors";
 import { getNew } from "@models/payment-model";
-import { amendPayment, persistPayment, validatePayment } from "@shared/validation";
+import { amendPayment, charge, validatePayment } from "@shared/validation";
 // Constants
 const router = Router();
 const { CREATED, OK } = StatusCodes;
 
 // Paths
 export const p = {
-    getAll: '/',
     create: '/create',
     getOne: '/:payment_id',
     amend: '/:payment_id/amend',
+    getAll: '/',
     // schedule: '/:payment_id/schedule',
 } as const;
 
@@ -25,17 +25,16 @@ router.post(p.create, async (req: Request, res: Response) => {
     // extract user from request headers, usually done in middleware for auth purposes but
     // for simplicity I just do it here.
     const { access_token } = req.headers;
-    const { amount, description, receiving_user_id } = req.body;
+    const { amount, description, receiving_user_id, pay_date } = req.body;
     if (!amount || !description || !receiving_user_id) {
         // this if clause attends to Validation Rule #3 in the specs.
         throw new IncorrectPaymentFields();
     }
     // can use 'as string' in following as access_token will never be of type string[], see req.headers docs for more info
-    validatePayment(access_token as string, amount, receiving_user_id);
+    validatePayment(access_token as string, amount, receiving_user_id, pay_date);
     // if no error has been thrown, then we can create a new payment object and attempt to charge.
-    const payment = getNew(access_token as string, amount, description, receiving_user_id);
-    await persistPayment(payment);
-    // return success
+    const payment = getNew(access_token as string, amount, description, receiving_user_id, pay_date);
+    await charge(payment);
     return res.status(OK).json(payment);
 });
 

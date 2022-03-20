@@ -13,7 +13,8 @@ export interface IPayment {
     created_at: string;
     amended_at?: string;
     receiving_user_id: string;
-    state: State
+    state: State;
+    pay_date: Date;
 }
 
 
@@ -22,7 +23,7 @@ export interface IPayment {
  * 
  * @returns 
  */
-export function getNew(user_id: string, amount: number, description: string, receiving_user_id: string): IPayment {
+export function getNew(user_id: string, amount: number, description: string, receiving_user_id: string, pay_date?: string): IPayment {
     const payment_id = uuidv4();
     return {
         payment_id: payment_id,
@@ -31,7 +32,8 @@ export function getNew(user_id: string, amount: number, description: string, rec
         description,
         receiving_user_id,
         created_at: new Date().toISOString(),
-        state: "pending"
+        state: "pending",
+        pay_date: pay_date ? new Date(pay_date) : new Date()
     };
 }
 

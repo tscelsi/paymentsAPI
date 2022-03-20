@@ -20,6 +20,14 @@ export class UnauthorisedError extends CustomError {
     }
 }
 
+export class InvalidDateError extends CustomError {
+    public static readonly Msg = 'Invalid date provided for payment.';
+    public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
+
+    constructor() {
+        super(InvalidDateError.Msg, InvalidDateError.HttpStatus);
+    }
+}
 
 export class ParamMissingError extends CustomError {
 
