@@ -10,11 +10,10 @@ const { CREATED, OK } = StatusCodes;
 
 // Paths
 export const p = {
-    create: '/create',
-    getOne: '/:payment_id',
-    amend: '/:payment_id/amend',
-    getAll: '/',
-    // schedule: '/:payment_id/schedule',
+    create: '/create', //post
+    getOne: '/:payment_id', //get
+    amend: '/:payment_id/amend', //post
+    getAll: '/', //get
 } as const;
 
 /**
