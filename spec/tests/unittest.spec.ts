@@ -54,7 +54,7 @@ describe('unittests', () => {
             const nextBusinessDate = getNextBusinessDate(new Date());
             const scheduled_date = new Date(nextBusinessDate.getTime()); // 12th Descember, 2022
             const result = isScheduledPayment(scheduled_date);
-            expect(result).toBe(true);
+            expect(result).toBe(false);
             done();
         });
     })
