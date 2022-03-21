@@ -16,7 +16,6 @@
       - [POST /payments/create](#post-paymentscreate)
     - [**/customer**](#customer)
       - [/customer/balance](#customerbalance)
-- [Contact](#contact)
 
 # Installation
 
@@ -28,7 +27,17 @@ Node | 16.13.1
 Express | 4.17.3
 
 # Running the API
+
+The server was created to only be run in development mode:
+
+    npm run start:dev
+
 # Testing
+
+The test suite was created using supertest (an API testing framework) and jasmine. The tests can be run using the command:
+    
+    npm run test
+
 # Docs
 ## Payment States
 
@@ -164,4 +173,13 @@ If successful, this endpoint returns the newly created payment object.
     }
 ### **/customer**
 #### /customer/balance
-# Contact
+
+`TYPE:` **GET**
+
+`RESPONSE:`
+If successfully authenticated, this endpoint returns the name and balance for the authenticated account.
+
+    {
+      name: string,   // name associated with account
+      balance: number   // balance of the account
+    }
